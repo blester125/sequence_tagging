@@ -4,9 +4,10 @@ setup(
     name="sequence_tagging",
     version="0.1.0",
     description="Sequence Tagging powered by the Averaged Perceptron.",
-    long_description=open('README.md').read(),
     author="Brian Lester",
     author_email="blester125@gmail.com",
+    url="https://github.com/blester125/sequence_tagging",
+    download_url="https://github.com/blester125/sequence_tagging/archive/0.1.0.tar.gz",
     license="MIT",
     packages=find_packages(),
     package_data={
@@ -16,4 +17,5 @@ setup(
         ],
     },
     include_package_data=True,
+    keywords=["NLP", "sequence tagging", "ML"],
 )
