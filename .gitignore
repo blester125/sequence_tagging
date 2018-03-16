@@ -1,0 +1,9 @@
+__pycache__/
+*.p
+*.txt
+cython/
+build/
+sequence_tagging/data/POS/
+sequence_tagging/data/ATIS/
+*.egg*
+tag/
