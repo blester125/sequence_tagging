@@ -4,11 +4,13 @@ from collections import defaultdict
 
 class AveragedPerceptron(object):
 
-    def __init__(self):
+    def __init__(self, classes=None):
         # weights a dict of dict, weights[feature][class] = float
         self.weights = defaultdict(lambda: defaultdict(float))
         # Set of all the possible tags
         self.classes = set()
+        if classes is not None:
+            self.classes = set(classes)
         # Accumulated weight values implemented as
         # _weight_totals[feature][class] = float
         self._weight_totals = defaultdict(lambda: defaultdict(float))
@@ -17,7 +19,7 @@ class AveragedPerceptron(object):
         self._weight_tstamps = defaultdict(lambda: defaultdict(int))
         self.i = 0
 
-    def predict(self, features):
+    def dot(self, features):
         """Dot product the feature vector with each weight vector."""
         # Get the score for each class
         scores = defaultdict(float)
@@ -33,6 +35,9 @@ class AveragedPerceptron(object):
                 # for this feature, class
                 scores[label] += value * weight
         # get the class with the max score
+
+    def predict(self, features):
+        scores = self.dot(features)
         return max(self.classes, key=lambda label: (scores[label], label))
 
     def update(self, truth, guess, features):
