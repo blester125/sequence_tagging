@@ -7,3 +7,4 @@ sequence_tagging/data/POS/
 sequence_tagging/data/ATIS/
 *.egg*
 tag/
+dist/*

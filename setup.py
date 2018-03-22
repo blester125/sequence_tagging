@@ -2,12 +2,12 @@ from setuptools import setup, find_packages
 
 setup(
     name="sequence_tagging",
-    version="0.1.1",
+    version="0.1.2",
     description="Sequence Tagging powered by the Averaged Perceptron.",
     author="Brian Lester",
     author_email="blester125@gmail.com",
     url="https://github.com/blester125/sequence_tagging",
-    download_url="https://github.com/blester125/sequence_tagging/archive/0.1.0.tar.gz",
+    download_url="https://github.com/blester125/sequence_tagging/archive/0.1.2.tar.gz",
     license="MIT",
     packages=find_packages(),
     package_data={

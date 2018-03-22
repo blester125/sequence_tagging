@@ -34,10 +34,11 @@ class AveragedPerceptron(object):
                 # for each class multiply feature * weight
                 # for this feature, class
                 scores[label] += value * weight
-        # get the class with the max score
+        return scores
 
     def predict(self, features):
         scores = self.dot(features)
+        # get the class with the max score
         return max(self.classes, key=lambda label: (scores[label], label))
 
     def update(self, truth, guess, features):
