@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="sequence_tagging",
-    version="0.1.0",
+    version="0.1.1",
     description="Sequence Tagging powered by the Averaged Perceptron.",
     author="Brian Lester",
     author_email="blester125@gmail.com",
