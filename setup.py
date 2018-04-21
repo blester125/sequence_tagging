@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = "0.1.2"
+version = "0.1.3"
 
 setup(
     name="sequence_tagging",
@@ -14,8 +14,12 @@ setup(
     packages=find_packages(),
     package_data={
         'sequence_tagging': [
-            'sequence_tagging/data/model.p',
-            'sequence_tagging/data/tagdict.p',
+            'sequence_tagging/data/pos_model.p',
+            'sequence_tagging/data/pos_tagdict.p',
+            'sequence_tagging/data/chunk_model.p',
+            'sequence_tagging/data/chunk_tagdict.p',
+            'sequence_tagging/data/atis_model.p',
+            'sequence_tagging/data/atis_tagdict.p',
         ],
     },
     include_package_data=True,

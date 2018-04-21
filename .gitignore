@@ -8,3 +8,4 @@ sequence_tagging/data/ATIS/
 *.egg*
 tag/
 dist/*
+.python-version

@@ -8,9 +8,8 @@ import logging
 import argparse
 from itertools import chain
 # [ -Projects ]
-from sequence_tagging.process_data import read_data
-from sequence_tagging.tagger import Tagger, accuracy
-from sequence_tagging.tagger import MODEL_LOC, TAGDICT_LOC
+from sequence_tagging.process_data import read_data, Type
+from sequence_tagging.tagger import Tagger, accuracy, get_loc
 
 
 def nltk_eval(test_X, test_y):
@@ -43,29 +42,43 @@ def nltk_eval(test_X, test_y):
     )
 
 
+def make_enum(string):
+    if string == "chunk":
+        return Type.CHUNK
+    elif string == "atis":
+        return Type.ATIS
+    return Type.POS
+
+
 def main():
-    parser = argparse.ArgumentParser("POS Tagger")
+    parser = argparse.ArgumentParser("Sequence Tagger")
     parser.add_argument("type", choices=["train", "eval"])
     parser.add_argument("--iter", "-i", type=int, default=5, dest="iter")
-    parser.add_argument("--data", "-d", choices=["pos", "atis"], default="pos", dest="data")
+    parser.add_argument(
+        "--data", "-d",
+        choices=[Type.POS, Type.CHUNK, Type.ATIS], default="pos",
+        dest="data", type=make_enum
+    )
     parser.add_argument("--compare", "-c", action="store_true")
     args = parser.parse_args()
 
-    if args.data == "pos":
-        test_file = "data/POS/test.txt"
-    else:
+    if args.data is Type.ATIS:
         test_file = "data/ATIS/test.txt"
-    test_X, test_y = read_data(test_file)
+    else:
+        # POS or Chunk
+        test_file = "data/POS/test.txt"
+    test_X, test_y = read_data(test_file, args.data)
+    model_loc, tag_loc = get_loc(args.data)
     if args.type == "train":
-        if args.data == "pos":
-            train_file = "data/POS/train.txt"
-        else:
+        if args.data is Type.ATIS:
             train_file = "data/ATIS/train.txt"
-        train_X, train_y = read_data(train_file)
+        else:
+            train_file = "data/POS/train.txt"
+        train_X, train_y = read_data(train_file, args.data)
         tagger = Tagger()
         tagger.train(train_X, train_y, n_iters=args.iter)
-        tagger.save("model.p", "tag.p")
-    tagger = Tagger.load("model.p", "tag.p")
+        tagger.save(model_loc, tag_loc)
+    tagger = Tagger.load(model_loc, tag_loc)
     t0 = time.time()
     tagger.evaluate(test_X, test_y)
     elapsed_time = time.time() - t0
@@ -75,7 +88,7 @@ def main():
     print(test_X[random_index])
     print(tagger.tag([test_X[random_index]]))
 
-    if args.data == "pos":
+    if args.data is Type.POS:
         if args.compare:
             t0 = time.time()
             nltk_eval(test_X, test_y)

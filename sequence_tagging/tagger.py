@@ -9,12 +9,26 @@ from pathlib import Path
 from itertools import chain
 from collections import defaultdict
 # [ -Project ]
+from sequence_tagging.process_data import Type
 from sequence_tagging.perceptron import AveragedPerceptron
 
 logging.getLogger().setLevel(logging.INFO)
 random.seed(1337)
-MODEL_LOC = Path(__file__).parent / "data" / "model.p"
-TAGDICT_LOC = Path(__file__).parent / "data" / "tagdict.p"
+
+POS_MODEL_LOC = Path(__file__).parent / "data" / "pos_model.p"
+POS_TAGDICT_LOC = Path(__file__).parent / "data" / "pos_tagdict.p"
+CHUNK_MODEL_LOC = Path(__file__).parent / "data" / "chunk_model.p"
+CHUNK_TAGDICT_LOC = Path(__file__).parent / "data" / "chunk_tagdict.p"
+ATIS_MODEL_LOC = Path(__file__).parent / "data" / "atis_model.p"
+ATIS_TAGDICT_LOC = Path(__file__).parent / "data" / "atis_tagdict.p"
+
+
+def get_loc(dtype):
+    if dtype is Type.CHUNK:
+        return CHUNK_MODEL_LOC, CHUNK_TAGDICT_LOC
+    if dtype is Type.ATIS:
+        return ATIS_MODEL_LOC, ATIS_TAGDICT_LOC
+    return POS_MODEL_LOC, POS_TAGDICT_LOC
 
 
 class Tagger(object):
@@ -29,14 +43,14 @@ class Tagger(object):
         self.ambiguity_thresh = ambiguity_thresh
 
     @classmethod
-    def load(cls, model_loc=MODEL_LOC, tag_loc=TAGDICT_LOC):
+    def load(cls, model_loc=POS_MODEL_LOC, tag_loc=POS_TAGDICT_LOC):
         tagger = cls()
         tagger.model = AveragedPerceptron.load(model_loc)
         tagger.classes = tagger.model.classes
         tagger.tagdict = pickle.load(open(tag_loc, "rb"))
         return tagger
 
-    def save(self, model_loc=MODEL_LOC, tag_loc=TAGDICT_LOC):
+    def save(self, model_loc=POS_MODEL_LOC, tag_loc=POS_TAGDICT_LOC):
         self.model.save(model_loc)
         pickle.dump(self.tagdict, open(tag_loc, "wb"))
 
