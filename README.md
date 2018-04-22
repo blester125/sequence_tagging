@@ -3,7 +3,7 @@
 
 A Part of Speech tagger using the Average Perceptron.
 
-Trained on CoNLL 2000 Chunking data.
+Based on the tagger from [here](https://explosion.ai/blog/part-of-speech-pos-tagger-in-python)
 
 This uses the following features:
 
@@ -21,3 +21,9 @@ This uses the following features:
  * The next word suffix.
  * The word after next.
  * A Bias
+ 
+ Incudles the following Pretrained models.
+ 
+  * POS Tagger, Trained on the CoNLL 2000 Chunking data
+  * Chunker, Trained on the CoNLL 2000 Chunking data
+  * Slot filler, Trained on ATIS data
