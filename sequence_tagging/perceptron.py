@@ -4,7 +4,8 @@ from collections import defaultdict
 
 class AveragedPerceptron(object):
 
-    def __init__(self, classes=None):
+    def __init__(self, classes=None, lr=1.0):
+        super().__init__()
         # weights a dict of dict, weights[feature][class] = float
         self.weights = defaultdict(lambda: defaultdict(float))
         # Set of all the possible tags
@@ -18,6 +19,7 @@ class AveragedPerceptron(object):
         # _weights_tstamps[feature][class] = int
         self._weight_tstamps = defaultdict(lambda: defaultdict(int))
         self.i = 0
+        self.lr = lr
 
     def dot(self, features):
         """Dot product the feature vector with each weight vector."""
@@ -42,20 +44,20 @@ class AveragedPerceptron(object):
         return max(self.classes, key=lambda label: (scores[label], label))
 
     def update(self, truth, guess, features):
-        def update_features(c, f, w, v):
+        def update_features(c, f, w, lr, v):
             self._update_accumulator(f, c, w)
             # Update the weight
-            self.weights[f][c] = w + v
+            self.weights[f][c] = w + (lr * v)
 
         self.i += 1
         # if we were were right don't change anything
         if truth == guess:
             return
         # Update all the feature weights for the correct class and predicted class.
-        for f in features:
+        for f, w in features.items():
             weights = self.weights[f]
-            update_features(truth, f, weights[truth], 1.0)
-            update_features(guess, f, weights[guess], -1.0)
+            update_features(truth, f, weights[truth], self.lr, w)
+            update_features(guess, f, weights[guess], self.lr, -w)
 
     def _update_accumulator(self, feature, class_, weight):
         # Use the timestamp to update the accumulator
@@ -64,7 +66,7 @@ class AveragedPerceptron(object):
 
     def average_weights(self):
         for feat, weights in self.weights.items():
-            new_feat_weights = {}
+            new_feat_weights = defaultdict(int)
             for clas, weight in weights.items():
                 self._update_accumulator(feat, clas, weight)
                 total = self._weight_totals[feat][clas]
@@ -72,7 +74,6 @@ class AveragedPerceptron(object):
                 if averaged:
                     new_feat_weights[clas] = averaged
             self.weights[feat] = new_feat_weights
-        self.weights = dict(self.weights)
 
     def save(self, path):
         pickle.dump([dict(self.weights), self.classes], open(path, 'wb'))
