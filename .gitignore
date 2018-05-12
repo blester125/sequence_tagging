@@ -6,6 +6,11 @@ build/*
 *.so
 __pycache__/
 */.ipynb_checkpoints/
+.pytest_cache/
+*.html
+*.p
+*.npy
+*/data/*
 cython/
 build/
 sequence_tagging/data/POS/

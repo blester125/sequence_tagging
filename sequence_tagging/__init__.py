@@ -1,3 +1,5 @@
+__version__ = '0.1.6'
+
 from sequence_tagging.tagger import (
     Tagger,
     POS_MODEL_LOC,

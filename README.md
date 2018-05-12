@@ -21,9 +21,9 @@ This uses the following features:
  * The next word suffix.
  * The word after next.
  * A Bias
- 
- Incudles the following Pretrained models.
- 
+
+Includes the following Pretrained models.
+
   * POS Tagger, Trained on the CoNLL 2000 Chunking data
   * Chunker, Trained on the CoNLL 2000 Chunking data
   * Slot filler, Trained on ATIS data
