@@ -42,12 +42,20 @@ train_slots.extend(train_slots2)
 dev_data, dev_labels, dev_slots = preprocess_file("atis-2.dev.w-intent.iob")
 test_data, test_labels, test_slots = preprocess_file("atis.test.w-intent.iob")
 
+print(len(test_data))
+
 all_labels = set(train_labels) & set(dev_labels) & set(test_labels)
+
 all_slots = set(chain(*train_slots)) & set(chain(*dev_slots)) & set(chain(*test_slots))
+print(len([x for x in chain(*test_slots) if x not in set(chain(*train_slots))]))
+print(len(set(chain(*test_slots)) & (set(chain(*test_slots)) ^ set(chain(*train_slots)))))
+print(len([x for x in chain(*dev_slots) if x not in set(chain(*train_slots))]))
 
 train = [[data, label, slots] for data, label, slots in zip(train_data, train_labels, train_slots) if label in all_labels and all(slot in all_slots for slot in slots)]
 dev = [[data, label, slots] for data, label, slots in zip(dev_data, dev_labels, dev_slots) if label in all_labels and all(slot in all_slots for slot in slots)]
 test = [[data, label, slots] for data, label, slots in zip(test_data, test_labels, test_slots) if label in all_labels and all(slot in all_slots for slot in slots)]
+
+print(len(test))
 
 write_to_file("train.txt", train)
 write_to_file("dev.txt", dev)

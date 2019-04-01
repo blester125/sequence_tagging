@@ -1,7 +1,14 @@
 """Functions to read in data."""
 from enum import Enum
 
-Type = Enum("Type", "POS CHUNK ATIS")
+class Type(Enum):
+    POS = "pos"
+    CHUNK = "chunk"
+    ATIS = "atis"
+    TWITTER = "twitter"
+
+    def __str__(self):
+        return self.value
 
 def read_data(filename, dtype=Type.POS):
     data = []
@@ -16,10 +23,13 @@ def read_data(filename, dtype=Type.POS):
                 sentence = []
                 sentence_labels = []
                 continue
+            line = line.rstrip("\n")
             if dtype is Type.POS or dtype is Type.ATIS:
                 word, d, _ = line.split()
             elif dtype is Type.CHUNK:
                 word, _, d = line.split()
+            elif dtype is Type.TWITTER:
+                word, d = line.split("\t")
             sentence.append(word)
             sentence_labels.append(d)
     return data, labels

@@ -21,6 +21,8 @@ CHUNK_MODEL_LOC = Path(__file__).parent / "data" / "chunk_model.p"
 CHUNK_TAGDICT_LOC = Path(__file__).parent / "data" / "chunk_tagdict.p"
 ATIS_MODEL_LOC = Path(__file__).parent / "data" / "atis_model.p"
 ATIS_TAGDICT_LOC = Path(__file__).parent / "data" / "atis_tagdict.p"
+TWITTER_MODEL_LOC = Path(__file__).parent / "data" / "twitter_model.p"
+TWITTER_TAGDICT_LOC = Path(__file__).parent / "data" / "twitter_tagdict.p"
 
 
 def get_loc(dtype):
@@ -28,6 +30,8 @@ def get_loc(dtype):
         return CHUNK_MODEL_LOC, CHUNK_TAGDICT_LOC
     if dtype is Type.ATIS:
         return ATIS_MODEL_LOC, ATIS_TAGDICT_LOC
+    if dtype is Type.TWITTER:
+        return TWITTER_MODEL_LOC, TWITTER_TAGDICT_LOC
     return POS_MODEL_LOC, POS_TAGDICT_LOC
 
 
@@ -180,6 +184,57 @@ class Tagger(object):
             if total >= self.freq_thresh and mode / total >= self.ambiguity_thresh:
                 self.tagdict[word] = tag
 
+class TwitterTagger(Tagger):
+
+    def _get_features(self, i, word, context, prev, prev2):
+        i += len(self.START)
+        features = defaultdict(int)
+
+        def add(name, *args):
+            features[' '.join((name,) + tuple(args))] += 1
+
+        add('bias')
+        add('i word', context[i])
+        add('i suffix', word[-3:])
+        add('i prefix', word[0])
+        if word[0] == "@":
+            add('i mention')
+            add('i word + mention', context[i][1:])
+        if word[0] == "#":
+            add('i hashtag')
+            add('i word + hashtag', context[i][1:])
+
+        add('i-1 tag', prev)
+        add('i-2 tag', prev2)
+        add('i-1 tag + 1-2 tag', prev, prev2)
+        add('i - 1 tag + i word', prev, context[i])
+
+        add('i - 1 word', context[i - 1])
+        add('i - 1 suffix', context[i - 1][-3:])
+        if context[i - 1][0] == "@":
+            add('i - 1 mention')
+            add('i - 1 word + mention', context[i - 1][1:])
+        if context[i - 1][0] == "#":
+            add('i - 1 hashtag')
+            add('i - 1 word + hashtag', context[i - 1][1:])
+        add('i - 2 word', context[i - 2])
+        if context[i - 2][0] == "@":
+            add('i - 2 mention')
+            add('i - 2 word + mention', context[i - 2][1:])
+        if context[i - 1][0] == "#":
+            add('i - 2 hashtag')
+            add('i - 2 word + hashtag', context[i - 2][1:])
+        add('i + 1 word', context[i + 1])
+        add('i + 1 suffix', context[i + 1][-3:])
+        if context[i + 1][0] == "@":
+            add('i + 1 mention')
+            add('i + 1 word + mention', context[i + 1][1:])
+        if context[i + 2][0] == "#":
+            add('i + 1 hashtag')
+            add('i + 1 word + hashtag', context[i + 1][1:])
+        add('i + 2 word', context[i + 2])
+
+        return features
 
 def _normalize(word):
     if '-' in word:

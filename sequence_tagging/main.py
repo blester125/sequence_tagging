@@ -9,7 +9,7 @@ import argparse
 from itertools import chain
 # [ -Projects ]
 from sequence_tagging.process_data import read_data, Type
-from sequence_tagging.tagger import Tagger, accuracy, get_loc
+from sequence_tagging.tagger import Tagger, TwitterTagger, accuracy, get_loc
 
 
 def nltk_eval(test_X, test_y):
@@ -47,7 +47,11 @@ def make_enum(string):
         return Type.CHUNK
     elif string == "atis":
         return Type.ATIS
-    return Type.POS
+    elif string == "twitter":
+        return Type.TWITTER
+    elif string == "pos":
+        return Type.POS
+    return None
 
 
 def main():
@@ -56,7 +60,7 @@ def main():
     parser.add_argument("--iter", "-i", type=int, default=5, dest="iter")
     parser.add_argument(
         "--data", "-d",
-        choices=[Type.POS, Type.CHUNK, Type.ATIS], default="pos",
+        choices=[Type.POS, Type.CHUNK, Type.ATIS, Type.TWITTER], default="pos",
         dest="data", type=make_enum
     )
     parser.add_argument("--compare", "-c", action="store_true")
@@ -64,6 +68,8 @@ def main():
 
     if args.data is Type.ATIS:
         test_file = "data/ATIS/test.txt"
+    elif args.data is Type.TWITTER:
+        test_file = "data/TWPOS/oct27.test"
     else:
         # POS or Chunk
         test_file = "data/POS/test.txt"
@@ -72,10 +78,15 @@ def main():
     if args.type == "train":
         if args.data is Type.ATIS:
             train_file = "data/ATIS/train.txt"
+        elif args.data is Type.TWITTER:
+            train_file = "data/TWPOS/oct27.train"
         else:
             train_file = "data/POS/train.txt"
         train_X, train_y = read_data(train_file, args.data)
-        tagger = Tagger()
+        if args.data is Type.TWITTER:
+            tagger = TwitterTagger()
+        else:
+            tagger = Tagger()
         tagger.train(train_X, train_y, n_iters=args.iter)
         tagger.save(model_loc, tag_loc)
     tagger = Tagger.load(model_loc, tag_loc)
